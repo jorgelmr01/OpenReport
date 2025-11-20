@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Openbank Report Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo-section">
+                    <img src="Openbank-comienza-a-operar-en-Mexico-1000x600.png" alt="Openbank" class="logo">
+                    <h1>Report Generator</h1>
+                </div>
+                <div class="api-section">
+                    <label for="apiKey">API Key:</label>
+                    <input type="password" id="apiKey" placeholder="Enter OpenAI API Key" aria-label="OpenAI API Key" />
+                    <button id="toggleApiKey" class="btn-icon" title="Show/Hide" aria-label="Toggle API key visibility">👁️</button>
+                    <label for="modelSelect">Model:</label>
+                    <select id="modelSelect" aria-label="Select AI Model">
+                        <option value="gpt-4o">GPT-4o</option>
+                        <option value="gpt-4o-mini">GPT-4o Mini</option>
+                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                        <option value="gpt-4">GPT-4</option>
+                        <option value="o1-preview">O1 Preview</option>
+                        <option value="o1-mini">O1 Mini</option>
+                    </select>
+                    <span id="apiStatus" class="status-indicator"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Preset Management Bar -->
+    <div class="preset-bar">
+        <div class="container">
+            <div class="preset-controls">
+                <button id="newPreset" class="btn btn-secondary">New Preset</button>
+                <button id="savePreset" class="btn btn-primary">Save Preset</button>
+                <button id="loadPreset" class="btn btn-secondary">Load Preset</button>
+                <input type="file" id="presetFileInput" accept=".json" style="display: none;" aria-label="Load preset file" />
+                <span id="presetName" class="preset-name">Untitled Preset</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Report Title -->
+            <div class="report-title-section">
+                <label for="reportTitle">Report Title</label>
+                <input type="text" id="reportTitle" placeholder="Enter report title..." />
+            </div>
+
+            <!-- AI Assistant Toggle -->
+            <div class="assistant-toggle">
+                <button id="toggleAssistant" class="btn btn-accent">
+                    🤖 AI Assistant - Configure Report Structure
+                </button>
+            </div>
+
+            <!-- Global Documents Section -->
+            <div class="global-documents-section">
+                <div class="global-docs-header">
+                    <h3>📎 General Documents (Applied to All Sections)</h3>
+                    <p>Upload documents that provide general context for the entire report</p>
+                </div>
+                <div class="file-upload-area" id="globalFileUploadArea">
+                    <div class="file-upload-icon">📁</div>
+                    <div class="file-upload-text">
+                        <strong>Click to upload</strong> or drag and drop<br>
+                        <small>PDF, DOCX, TXT, XLSX files (max 10MB each)</small>
+                    </div>
+                    <input type="file" id="globalFileInput" multiple accept=".pdf,.docx,.txt,.xlsx,.xls,.csv" style="display: none;" aria-label="Upload global documents">
+                </div>
+                <div id="globalUploadedFiles" class="uploaded-files"></div>
+            </div>
+
+            <!-- Sections Container -->
+            <div class="sections-container" id="sectionsContainer">
+                <div class="empty-state" id="emptyState">
+                    <h2>No sections yet</h2>
+                    <p>Click "Add Section" to start building your report, or use the AI Assistant to auto-configure sections.</p>
+                </div>
+            </div>
+
+            <!-- Add Section Button -->
+            <div class="add-section-container">
+                <button id="addSection" class="btn btn-large btn-primary">+ Add Section</button>
+            </div>
+
+            <!-- Generate Report Button -->
+            <div class="generate-container">
+                <div id="tokenEstimate" class="token-estimate" style="display: none;">
+                    <h4>📊 Generation Estimate</h4>
+                    <div class="estimate-details">
+                        <p><strong>Estimated tokens:</strong> <span id="estimatedTokens">-</span></p>
+                        <p><strong>Estimated cost:</strong> <span id="estimatedCost">-</span></p>
+                        <p><strong>Rate limit:</strong> <span id="rateLimitStatus">-</span></p>
+                    </div>
+                </div>
+                <button id="generateReport" class="btn btn-large btn-success">Generate Report</button>
+                <div id="progressContainer" class="progress-container" style="display: none;">
+                    <div class="progress-bar">
+                        <div id="progressBar" class="progress-fill"></div>
+                    </div>
+                    <p id="progressText" class="progress-text"></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Assistant Modal -->
+    <div id="assistantModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>AI Assistant - Report Structure Helper</h2>
+                <button class="close-btn" id="closeAssistant">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="chat-container">
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="chat-message assistant-message">
+                            <p>Hello! I'm your AI assistant. Describe the report you want to create, and I'll suggest sections with instructions for you.</p>
+                            <p>For example: "I need a quarterly financial report" or "Create a market analysis report for the tech industry"</p>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <textarea id="chatInput" placeholder="Describe your report needs..." rows="3" aria-label="Chat input"></textarea>
+                        <button id="sendChat" class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+                <div class="assistant-actions">
+                    <button id="applySuggestions" class="btn btn-success" style="display: none;">Apply Suggestions to Report</button>
+                    <button id="clearChat" class="btn btn-secondary">Clear Chat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Report Preview</h2>
+                <button class="close-btn" id="closePreview">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent" class="preview-content"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="exportReport" class="btn btn-primary">Export to Word</button>
+                <button id="closePreviewBtn" class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p id="loadingText">Processing...</p>
+    </div>
+
+    <!-- Success Overlay -->
+    <div id="successOverlay" class="success-overlay" style="display: none;">
+        <div class="success-box">
+            <div class="success-icon">✅</div>
+            <h2>Report Generated Successfully!</h2>
+            <p>Your report is ready to export.</p>
+            <div class="success-actions">
+                <button id="downloadWordBtn" class="btn btn-large btn-success">📄 Export to Word</button>
+                <button id="viewPreviewBtn" class="btn btn-large btn-secondary">👁️ View Preview</button>
+            </div>
+            <button id="closeSuccessBtn" class="btn-text">Close</button>
+        </div>
+    </div>
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
+
+    <!-- Application Scripts -->
+    <script src="error-logger.js"></script>
+    <script src="token-manager.js"></script>
+    <script src="api-handler.js"></script>
+    <script src="doc-processor.js"></script>
+    <script src="export-handler.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+

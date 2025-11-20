@@ -1,0 +1,48 @@
+{
+  "name": "Market Analysis Report",
+  "model": "gpt-4o",
+  "sections": [
+    {
+      "name": "Executive Summary",
+      "description": "Provide a concise overview of the market analysis findings, key trends identified, and main recommendations for strategic positioning.",
+      "manualText": ""
+    },
+    {
+      "name": "Market Overview",
+      "description": "Describe the overall market landscape, size, growth rate, and key characteristics. Include relevant market statistics and trends.",
+      "manualText": ""
+    },
+    {
+      "name": "Industry Trends",
+      "description": "Analyze current and emerging trends in the industry, technological developments, regulatory changes, and their potential impact on the market.",
+      "manualText": ""
+    },
+    {
+      "name": "Competitive Landscape",
+      "description": "Identify key competitors, their market positions, strengths, weaknesses, and competitive strategies. Include market share analysis.",
+      "manualText": ""
+    },
+    {
+      "name": "Customer Segmentation",
+      "description": "Analyze target customer segments, their characteristics, needs, behaviors, and preferences. Include demographic and psychographic profiles.",
+      "manualText": ""
+    },
+    {
+      "name": "Opportunities and Threats",
+      "description": "Identify market opportunities for growth and expansion, as well as potential threats and challenges that need to be addressed.",
+      "manualText": ""
+    },
+    {
+      "name": "Strategic Recommendations",
+      "description": "Provide actionable recommendations for market positioning, product development, marketing strategies, and competitive differentiation.",
+      "manualText": ""
+    },
+    {
+      "name": "Conclusion",
+      "description": "Summarize the key findings and emphasize the most critical insights for decision-making and strategic planning.",
+      "manualText": ""
+    }
+  ],
+  "createdAt": "2025-11-20T12:00:00.000Z"
+}
+
