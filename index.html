@@ -1,198 +1,258 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Openbank Report Generator</title>
+    <title>OpenReport | Professional Report Generator</title>
+
+    <!-- Custom Styles (includes fallback for Tailwind utilities) -->
     <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <!-- Top Navigation Bar -->
-    <header class="top-nav">
-        <div class="container">
-            <div class="nav-content">
-                <div class="logo-section">
-                    <img src="Openbank-comienza-a-operar-en-Mexico-1000x600.png" alt="Openbank" class="logo">
-                    <h1>Report Generator</h1>
-                </div>
-                <div class="api-section">
-                    <label for="apiKey">API Key:</label>
-                    <input type="password" id="apiKey" placeholder="Enter OpenAI API Key" aria-label="OpenAI API Key" />
-                    <button id="toggleApiKey" class="btn-icon" title="Show/Hide" aria-label="Toggle API key visibility">👁️</button>
-                    <label for="modelSelect">Model:</label>
-                    <select id="modelSelect" aria-label="Select AI Model">
-                        <option value="gpt-4o">GPT-4o</option>
-                        <option value="gpt-4o-mini">GPT-4o Mini</option>
-                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
-                        <option value="gpt-4">GPT-4</option>
-                        <option value="o1-preview">O1 Preview</option>
-                        <option value="o1-mini">O1 Mini</option>
-                    </select>
-                    <span id="apiStatus" class="status-indicator"></span>
-                </div>
-            </div>
-        </div>
-    </header>
 
-    <!-- Preset Management Bar -->
-    <div class="preset-bar">
-        <div class="container">
-            <div class="preset-controls">
-                <button id="newPreset" class="btn btn-secondary">New Preset</button>
-                <button id="savePreset" class="btn btn-primary">Save Preset</button>
-                <button id="loadPreset" class="btn btn-secondary">Load Preset</button>
-                <input type="file" id="presetFileInput" accept=".json" style="display: none;" aria-label="Load preset file" />
-                <span id="presetName" class="preset-name">Untitled Preset</span>
-            </div>
-        </div>
-    </div>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Critical Inline Styles (Fallback) -->
+    <style>
+        /* Fallback font */
+        @font-face {
+            font-family: 'Inter';
+            src: local('Inter'), local('Arial'), local('sans-serif');
+        }
+        
+        /* Critical Base Styles */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.5; }
+        body { background-color: #f9fafb; color: #111827; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* Critical Layout */
+        .flex { display: flex; }
+        .flex-1 { flex: 1 1 0%; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        
+        /* Critical Sizing */
+        .w-8 { width: 2rem; }
+        .h-8 { height: 2rem; }
+        .w-5 { width: 1.25rem; }
+        .h-5 { height: 1.25rem; }
+        .w-64 { width: 16rem; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .h-16 { height: 4rem; }
+        
+        /* Critical Spacing */
+        .p-2 { padding: 0.5rem; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .px-8 { padding-left: 2rem; padding-right: 2rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .space-y-1 > * + * { margin-top: 0.25rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        
+        /* Critical Colors */
+        .bg-white { background-color: #ffffff; }
+        .bg-gray-50 { background-color: #f9fafb; }
+        .bg-gray-100 { background-color: #f3f4f6; }
+        .bg-red-600 { background-color: #dc2626; }
+        .text-white { color: #ffffff; }
+        .text-gray-400 { color: #9ca3af; }
+        .text-gray-500 { color: #6b7280; }
+        .text-gray-600 { color: #4b5563; }
+        .text-gray-800 { color: #1f2937; }
+        .text-gray-900 { color: #111827; }
+        
+        /* Critical Typography */
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        
+        /* Critical Borders */
+        .border { border: 1px solid #e5e7eb; }
+        .border-b { border-bottom: 1px solid #e5e7eb; }
+        .border-r { border-right: 1px solid #e5e7eb; }
+        .border-gray-100 { border-color: #f3f4f6; }
+        .border-gray-200 { border-color: #e5e7eb; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        
+        /* Critical Effects */
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .overflow-hidden { overflow: hidden; }
+        .overflow-y-auto { overflow-y: auto; }
+        .z-10 { z-index: 10; }
+        
+        /* Critical Transitions */
+        .transition-colors { transition: color 0.15s, background-color 0.15s, border-color 0.15s; }
+        
+        /* Hover States */
+        .hover\:bg-gray-50:hover { background-color: #f9fafb; }
+        .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
+        
+        /* Sidebar specific */
+        nav button { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; width: 100%; text-align: left; font-size: 0.875rem; font-weight: 500; color: #4b5563; background: none; border: none; cursor: pointer; transition: background-color 0.15s; }
+        nav button:hover { background-color: #f9fafb; }
+        
+        /* Form elements */
+        input, select, textarea { font-family: inherit; padding: 0.5rem 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1); }
+        button { cursor: pointer; }
+    </style>
 
-    <!-- Main Content Area -->
-    <main class="main-content">
-        <div class="container">
-            <!-- Report Title -->
-            <div class="report-title-section">
-                <label for="reportTitle">Report Title</label>
-                <input type="text" id="reportTitle" placeholder="Enter report title..." />
-            </div>
-
-            <!-- AI Assistant Toggle -->
-            <div class="assistant-toggle">
-                <button id="toggleAssistant" class="btn btn-accent">
-                    🤖 AI Assistant - Configure Report Structure
-                </button>
-            </div>
-
-            <!-- Global Documents Section -->
-            <div class="global-documents-section">
-                <div class="global-docs-header">
-                    <h3>📎 General Documents (Applied to All Sections)</h3>
-                    <p>Upload documents that provide general context for the entire report</p>
-                </div>
-                <div class="file-upload-area" id="globalFileUploadArea">
-                    <div class="file-upload-icon">📁</div>
-                    <div class="file-upload-text">
-                        <strong>Click to upload</strong> or drag and drop<br>
-                        <small>PDF, DOCX, TXT, XLSX files (max 10MB each)</small>
-                    </div>
-                    <input type="file" id="globalFileInput" multiple accept=".pdf,.docx,.txt,.xlsx,.xls,.csv" style="display: none;" aria-label="Upload global documents">
-                </div>
-                <div id="globalUploadedFiles" class="uploaded-files"></div>
-            </div>
-
-            <!-- Sections Container -->
-            <div class="sections-container" id="sectionsContainer">
-                <div class="empty-state" id="emptyState">
-                    <h2>No sections yet</h2>
-                    <p>Click "Add Section" to start building your report, or use the AI Assistant to auto-configure sections.</p>
-                </div>
-            </div>
-
-            <!-- Add Section Button -->
-            <div class="add-section-container">
-                <button id="addSection" class="btn btn-large btn-primary">+ Add Section</button>
-            </div>
-
-            <!-- Generate Report Button -->
-            <div class="generate-container">
-                <div id="tokenEstimate" class="token-estimate" style="display: none;">
-                    <h4>📊 Generation Estimate</h4>
-                    <div class="estimate-details">
-                        <p><strong>Estimated tokens:</strong> <span id="estimatedTokens">-</span></p>
-                        <p><strong>Estimated cost:</strong> <span id="estimatedCost">-</span></p>
-                        <p><strong>Rate limit:</strong> <span id="rateLimitStatus">-</span></p>
-                    </div>
-                </div>
-                <button id="generateReport" class="btn btn-large btn-success">Generate Report</button>
-                <div id="progressContainer" class="progress-container" style="display: none;">
-                    <div class="progress-bar">
-                        <div id="progressBar" class="progress-fill"></div>
-                    </div>
-                    <p id="progressText" class="progress-text"></p>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- AI Assistant Modal -->
-    <div id="assistantModal" class="modal">
-        <div class="modal-content modal-large">
-            <div class="modal-header">
-                <h2>AI Assistant - Report Structure Helper</h2>
-                <button class="close-btn" id="closeAssistant">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="chat-container">
-                    <div id="chatMessages" class="chat-messages">
-                        <div class="chat-message assistant-message">
-                            <p>Hello! I'm your AI assistant. Describe the report you want to create, and I'll suggest sections with instructions for you.</p>
-                            <p>For example: "I need a quarterly financial report" or "Create a market analysis report for the tech industry"</p>
-                        </div>
-                    </div>
-                    <div class="chat-input-container">
-                        <textarea id="chatInput" placeholder="Describe your report needs..." rows="3" aria-label="Chat input"></textarea>
-                        <button id="sendChat" class="btn btn-primary">Send</button>
-                    </div>
-                </div>
-                <div class="assistant-actions">
-                    <button id="applySuggestions" class="btn btn-success" style="display: none;">Apply Suggestions to Report</button>
-                    <button id="clearChat" class="btn btn-secondary">Clear Chat</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Preview Modal -->
-    <div id="previewModal" class="modal">
-        <div class="modal-content modal-large">
-            <div class="modal-header">
-                <h2>Report Preview</h2>
-                <button class="close-btn" id="closePreview">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div id="previewContent" class="preview-content"></div>
-            </div>
-            <div class="modal-footer">
-                <button id="exportReport" class="btn btn-primary">Export to Word</button>
-                <button id="closePreviewBtn" class="btn btn-secondary">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
-        <div class="loading-spinner"></div>
-        <p id="loadingText">Processing...</p>
-    </div>
-
-    <!-- Success Overlay -->
-    <div id="successOverlay" class="success-overlay" style="display: none;">
-        <div class="success-box">
-            <div class="success-icon">✅</div>
-            <h2>Report Generated Successfully!</h2>
-            <p>Your report is ready to export.</p>
-            <div class="success-actions">
-                <button id="downloadWordBtn" class="btn btn-large btn-success">📄 Export to Word</button>
-                <button id="viewPreviewBtn" class="btn btn-large btn-secondary">👁️ View Preview</button>
-            </div>
-            <button id="closeSuccessBtn" class="btn-text">Close</button>
-        </div>
-    </div>
+    <!-- Icons - Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        // Fallback if Lucide doesn't load
+        window.addEventListener('load', function() {
+            if (typeof lucide === 'undefined') {
+                console.warn('Lucide icons not loaded, using text fallbacks');
+                window.lucide = {
+                    createIcons: function() {
+                        document.querySelectorAll('[data-lucide]').forEach(function(el) {
+                            el.textContent = el.getAttribute('data-lucide').charAt(0).toUpperCase();
+                            el.style.width = '20px';
+                            el.style.height = '20px';
+                            el.style.display = 'inline-flex';
+                            el.style.alignItems = 'center';
+                            el.style.justifyContent = 'center';
+                            el.style.fontSize = '12px';
+                            el.style.fontWeight = 'bold';
+                            el.style.borderRadius = '50%';
+                            el.style.backgroundColor = '#e5e7eb';
+                        });
+                    }
+                };
+            }
+        });
+    </script>
 
     <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- Application Scripts -->
-    <script src="error-logger.js"></script>
-    <script src="token-manager.js"></script>
-    <script src="api-handler.js"></script>
-    <script src="doc-processor.js"></script>
-    <script src="export-handler.js"></script>
-    <script src="app.js"></script>
+    <!-- Quill.js (Rich Text Editor) -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <!-- Error Handling -->
+    <script>
+        window.onerror = function (msg, url, line, col, error) {
+            // Ignore generic "Script error." as it provides no useful information
+            if (msg === 'Script error.' && line === 0) return false;
+
+            const errorBox = document.createElement('div');
+            errorBox.style.position = 'fixed';
+            errorBox.style.top = '0';
+            errorBox.style.left = '0';
+            errorBox.style.width = '100%';
+            errorBox.style.backgroundColor = '#fee2e2';
+            errorBox.style.color = '#991b1b';
+            errorBox.style.padding = '20px';
+            errorBox.style.zIndex = '9999';
+            errorBox.style.fontFamily = 'monospace';
+            errorBox.style.borderBottom = '2px solid #b91c1c';
+            errorBox.innerHTML = '<strong>⚠️ Application Error:</strong><br>' + msg + '<br><small>' + url + ':' + line + '</small>';
+            document.body.appendChild(errorBox);
+            return false;
+        };
+    </script>
+</head>
+
+<body class="bg-gray-50 text-gray-900 h-screen overflow-hidden flex flex-col">
+
+    <div id="app" class="flex-1 flex overflow-hidden">
+        <!-- App will be mounted here -->
+    </div>
+
+    <!-- Core -->
+    <script src="js/core/EventBus.js"></script>
+    <script src="js/core/Store.js"></script>
+    <script src="js/core/Component.js"></script>
+
+    <!-- Services -->
+    <script src="js/services/OpenAIService.js"></script>
+    <script src="js/services/DocumentService.js"></script>
+    <script src="js/services/TokenService.js"></script>
+    <script src="js/services/ExportService.js"></script>
+
+    <!-- Config & Profiles (must load before components that use them) -->
+    <script src="js/core/ConfigManager.js"></script>
+    <script src="js/profiles/ProfileManager.js"></script>
+    
+    <!-- Data -->
+    <script src="js/data/Templates.js"></script>
+
+    <!-- Components -->
+    <script src="js/components/Sidebar.js"></script>
+    <script src="js/components/SectionManager.js"></script>
+    <script src="js/components/GlobalContextManager.js"></script>
+    <script src="js/components/ChatAssistant.js"></script>
+    <script src="js/components/PreviewModal.js"></script>
+    <script src="js/components/ProfileSelector.js"></script>
+    <script src="js/components/WelcomeModal.js"></script>
+    <script src="js/components/App.js"></script>
+
+    <!-- Initialization -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('OpenReport: Initializing...');
+            
+            // Check required dependencies
+            const deps = {
+                'Store': typeof Store !== 'undefined',
+                'Component': typeof Component !== 'undefined',
+                'EventBus': typeof EventBus !== 'undefined',
+                'App': typeof App !== 'undefined',
+                'Sidebar': typeof Sidebar !== 'undefined',
+                'SectionManager': typeof SectionManager !== 'undefined',
+                'GlobalContextManager': typeof GlobalContextManager !== 'undefined',
+                'ChatAssistant': typeof ChatAssistant !== 'undefined',
+                'PreviewModal': typeof PreviewModal !== 'undefined',
+                'WelcomeModal': typeof WelcomeModal !== 'undefined'
+            };
+            
+            const missing = Object.entries(deps).filter(([k, v]) => !v).map(([k]) => k);
+            if (missing.length > 0) {
+                console.error('Missing dependencies:', missing);
+            }
+            
+            try {
+                window.app = new App(document.getElementById('app'));
+                window.app.mount();
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                }
+                console.log('OpenReport: Ready!');
+            } catch (error) {
+                console.error('App initialization error:', error);
+                document.getElementById('app').innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: #991b1b;">
+                        <h2>Error Loading Application</h2>
+                        <p>${error.message}</p>
+                        <p style="margin-top: 1rem; font-size: 0.875rem; color: #6b7280;">
+                            Try refreshing the page or check the browser console for details.
+                        </p>
+                    </div>
+                `;
+            }
+        });
+    </script>
 </body>
-</html>
 
+</html>
